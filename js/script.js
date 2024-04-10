@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const hostAddress = "https://todo-api.coderslab.pl";
     const mainElement = document.querySelector("main");
 
+    // Display tasks with operations
+
+    // Functions responsible for interaction with api
     // fetch data - generic function that returns data in json format based on url passed
     function fetchDataFromApi(apiUrl) {
         return fetch(apiUrl, {
@@ -22,54 +25,46 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // function to get all tasks
+    // get all tasks
     function getTasks() {
         const getTasksUrl = hostAddress + "/api/tasks"
         return fetchDataFromApi(getTasksUrl);
     }
 
+    // function to get Operations for specific task
+    function apiListOperationsForTask(taskId) {
+        const url = hostAddress + "/api/tasks/" + taskId + "/operations";
+        return fetchDataFromApi(url);
+    }
+    // End of functions responsible for interaction with api
 
-    // tage creation generic functions
-    function createTagElement(tagType, parentElement, className) {
+
+    //  tag creation functions begin
+
+    // tag creation generic function
+    function createTagElement(tagType, parentElement, className = "", innerText = "") {
         const element = document.createElement(tagType);
         element.className = className;
+        element.innerText = innerText;
         parentElement.appendChild(element);
         return element;
     }
 
-    function createTagElementWithText(tagType, parentElement, className, innerText) {
-        const element = createTagElement(tagType, parentElement, className);
-        element.innerText = innerText;
-        return element;
+    // form creation function used in renderTask() function
+    function createOperationAddingForm(parentElement) {
+        const formContainerDiv = createTagElement("div", parentElement, "card-body");
+        const formElement = createTagElement("form", formContainerDiv);
+        const inputDiv = createTagElement("div", formElement, "input-group");
+        const inputTag = createTagElement("input", inputDiv, "form-control");
+        inputTag.type = "text";
+        inputTag.placeholder = "Operation description";
+        inputTag.minLength = "5";
+
+        const buttonDivWrapper = createTagElement("div", inputDiv, "input-group-append");
+        const addOperationButton = createTagElement("button", buttonDivWrapper, "btn btn-info", "Add");
     }
 
-    //  tag creation functions begin
-
-    function renderTask(task) {
-        let taskId = task.id;
-        console.log(taskId);
-        let taskTitle = task.title;
-        let taskDescription = task.description;
-        let taskStatus = task.status;
-
-        const section = createTagElement("section", mainElement, "mt-5 shadow");
-        const headerDiv = createTagElement("div", section, 'card-header d-flex justify-content-between align-items-center')
-        const headerLeftDiv = createTagElement("div", headerDiv, "");
-        createTagElementWithText("h5", headerLeftDiv, "", taskTitle);
-        createTagElementWithText("h6", headerLeftDiv, "card-subtitle text-muted", taskDescription);
-        const headerRightDiv = createTagElement("div", headerDiv, "");
-
-        if (taskStatus === "open") {
-            const finishButton = createTagElementWithText("button", headerRightDiv, 'btn btn-dark btn-sm js-task-open-only', "Finish");
-        }
-
-        const deleteButton = createTagElementWithText("button", headerRightDiv, 'btn btn-outline-danger btn-sm ml-2', "Delete");
-        const ulElement = createTagElement("ul", section, "");
-
-        displayOperations(taskId, ulElement, taskStatus);
-    }
-
-
+    // main function combining creation of tasks with operations for given task
     function displayTasks() {
         getTasks()
             .then(function (response) {
@@ -79,7 +74,36 @@ document.addEventListener("DOMContentLoaded", function () {
             })
     }
 
-    // renderOperations helper functions begin
+    // helper function for displayTasks() function
+    function renderTask(task) {
+        let taskId = task.id;
+        let taskTitle = task.title;
+        let taskDescription = task.description;
+        let taskStatus = task.status;
+
+        const section = createTagElement("section", mainElement, "card mt-5 shadow-sm");
+        const headerDiv = createTagElement("div", section, 'card-header d-flex justify-content-between align-items-center')
+        const headerLeftDiv = createTagElement("div", headerDiv);
+        createTagElement("h5", headerLeftDiv, "", taskTitle);
+        createTagElement("h6", headerLeftDiv, "card-subtitle text-muted", taskDescription);
+        const headerRightDiv = createTagElement("div", headerDiv);
+
+        const ulElement = createTagElement("ul", section, "list-group list-group-flush");
+
+        displayOperations(taskId, section, ulElement, taskStatus);
+
+        if (taskStatus === "open") {
+            const finishButton = createTagElement("button", headerRightDiv, 'btn btn-dark btn-sm js-task-open-only', "Finish");
+            createOperationAddingForm(section);
+
+        }
+
+        const deleteButton = createTagElement("button", headerRightDiv, 'btn btn-outline-danger btn-sm ml-2', "Delete");
+
+
+    }
+
+    // renderOperations() helper functions begin
     function formatTime(time) {
         let hours = Math.floor(time / 60);
         if (hours === 0) {
@@ -89,39 +113,38 @@ document.addEventListener("DOMContentLoaded", function () {
         let minutes = time - (hours * 60);
         return hours + "h " + minutes + "m";
     }
-    // renderOperation helper functions end
 
-    // function to get Operations for specific task
-    function apiListOperationsForTask(taskId) {
-        const url = hostAddress + "/api/tasks/" + taskId + "/operations";
-        return fetchDataFromApi(url);
-    }
 
-    // main displayOperations function
-    function displayOperations(taskId, operationListTag, taskStatus) {
+    // main displayOperations() function which is used in renderTask() function
+    function displayOperations(taskId, sectionTag, operationListTag, taskStatus) {
         apiListOperationsForTask(taskId)
             .then(function (json) {
                 return json.data;
             })
             .then(function (data) {
                 data.forEach(function (operation) {
-                    renderOperation(operationListTag, operation, taskStatus);
+                    renderOperation(operationListTag, sectionTag, operation, taskStatus);
                 })
             })
     }
 
-    function renderOperation(operationListTag, data, taskStatus) {
+    // function that is used in main displayOperations() function
+    function renderOperation(operationListTag, sectionTag, data, taskStatus) {
         let timeSpent = formatTime(data.timeSpent);
+        let description = data.description;
         const li = createTagElement("li", operationListTag, "list-group-item d-flex justify-content-between align-items-center");
-        const descriptionDiv = createTagElement("div", li, "");
-        const time = createTagElementWithText("time", li, "badge badge-success badge-pill ml-2", timeSpent);
+        const descriptionDiv = createTagElement("div", li, "", description);
+        const time = createTagElement("time", descriptionDiv, "badge badge-success badge-pill ml-2", timeSpent);
+        if (taskStatus !== "closed") {
+            const buttonDiv = createTagElement("div", li);
+            const addMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+15m");
+            const addHourButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+1h");
+            const deleteButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm", "Delete");
+        }
     }
+
 
     displayTasks();
 
-    apiListOperationsForTask("cdfb6501-5d6a-4fb7-9eac-859e1fa8695c")
-        .then(function (json) {
-            console.log(json.data);
-        });
 
 })
