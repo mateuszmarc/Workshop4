@@ -146,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const time = createTagElement("time", descriptionDiv, "badge badge-success badge-pill ml-2", timeSpent);
         if (taskStatus !== "closed") {
             const buttonDiv = createTagElement("div", li);
+            const subtractMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm mr-2", "-15m");
             const addMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+15m");
             const addHourButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+1h");
             const deleteButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm", "Delete");
