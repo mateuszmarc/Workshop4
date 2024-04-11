@@ -105,6 +105,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const deleteButton = createTagElement("button", headerRightDiv, 'btn btn-outline-danger btn-sm ml-2', "Delete");
+        deleteButton.addEventListener("click", function(event) {
+            event.preventDefault();
+            deleteTask(taskId, section);
+        });
     }
 
     // renderOperations() helper functions begin
@@ -136,6 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderOperation(operationListTag, sectionTag, data, taskStatus) {
         let timeSpent = formatTime(data.timeSpent);
         let description = data.description;
+        let operationId = data.id;
         const li = createTagElement("li", operationListTag, "list-group-item d-flex justify-content-between align-items-center");
         const descriptionDiv = createTagElement("div", li, "", description);
         const time = createTagElement("time", descriptionDiv, "badge badge-success badge-pill ml-2", timeSpent);
@@ -208,5 +213,42 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault();
         addTask();
     });
+
+//     Delete functionality
+    function apiDeleteTask(taskId){
+        const url = hostAddress + "/api/tasks/" + taskId;
+        return fetch(url, {
+            method: "DELETE",
+            headers : {
+                Authorization: apiKey,
+            }
+        })
+            .then(function(response) {
+                if (!response.ok) {
+                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
+                } else {
+                    return response;
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function (json) {
+                return json.data.raw.affectedRows;
+            })
+    }
+
+    function deleteTaskFromView(section) {
+        section.remove();
+    }
+
+    function deleteTask(taskId, taskSection) {
+        const result = apiDeleteTask(taskId);
+        result.then(function (rowsAffected) {
+            if (rowsAffected) {
+                deleteTaskFromView(taskSection);
+            }
+        })
+    }
 
 })
