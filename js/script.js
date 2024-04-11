@@ -3,6 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const hostAddress = "https://todo-api.coderslab.pl";
     const mainElement = document.querySelector("main");
 
+    // Add task form elements
+    const taskAddingForm = document.querySelector(".js-task-adding-form");
+    const taskNameInput = taskAddingForm.firstElementChild.firstElementChild;
+    const taskDescriptionInput = taskAddingForm.firstElementChild.nextElementSibling.firstElementChild;
+    clearFormInput(taskNameInput, taskDescriptionInput);
+
     // Display tasks with operations
 
     // Functions responsible for interaction with api
@@ -99,8 +105,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const deleteButton = createTagElement("button", headerRightDiv, 'btn btn-outline-danger btn-sm ml-2', "Delete");
-
-
     }
 
     // renderOperations() helper functions begin
@@ -146,5 +150,63 @@ document.addEventListener("DOMContentLoaded", function () {
 
     displayTasks();
 
+//     Add task functionality
+//     addTask() helper methods
+
+    function clearFormInput(...input) {
+        input.forEach(function (element) {
+            element.value = "";
+        })
+
+    }
+
+    function validateInput(taskName, taskDescription) {
+        return (taskName && taskName.length > 5 && taskDescription && taskDescription.length > 5)
+    }
+
+    function sendPostReqToAddTask(taskName, taskDescription) {
+        const url = hostAddress + "/api/tasks";
+        return fetch(url, {
+            method: "POST",
+            headers: {
+                Authorization: apiKey, 'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: taskName,
+                description: taskDescription,
+                status: 'open',
+            })
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
+                } else {
+                    return response;
+                }
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
+    function addTask() {
+        let taskName = taskNameInput.value;
+        let taskDescription = taskDescriptionInput.value;
+        if (validateInput(taskName, taskDescription)) {
+            clearFormInput(taskNameInput, taskDescriptionInput);
+            sendPostReqToAddTask(taskName, taskDescription)
+                .then(function (json) {
+                    renderTask(json.data);
+                });
+        }
+    }
+
+    taskAddingForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        addTask();
+    });
 
 })
