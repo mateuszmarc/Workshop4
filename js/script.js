@@ -57,17 +57,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // form creation function used in renderTask() function
-    function createOperationAddingForm(parentElement) {
-        const formContainerDiv = createTagElement("div", parentElement, "card-body");
+    function createOperationAddingForm(section, listTag, taskId, taskStatus) {
+        const formContainerDiv = createTagElement("div", section, "card-body");
         const formElement = createTagElement("form", formContainerDiv);
         const inputDiv = createTagElement("div", formElement, "input-group");
         const inputTag = createTagElement("input", inputDiv, "form-control");
         inputTag.type = "text";
         inputTag.placeholder = "Operation description";
         inputTag.minLength = "5";
-
+        inputTag.required = true;
         const buttonDivWrapper = createTagElement("div", inputDiv, "input-group-append");
         const addOperationButton = createTagElement("button", buttonDivWrapper, "btn btn-info", "Add");
+        // return formElement;
+
+        formElement.addEventListener("submit", function (event) {
+            event.preventDefault();
+            let description = inputTag.value;
+            if (validateInput(description)) {
+                addOperation(description, taskId, taskStatus, section, listTag);
+            }
+        })
     }
 
     // main function combining creation of tasks with operations for given task
@@ -100,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (taskStatus === "open") {
             const finishButton = createTagElement("button", headerRightDiv, 'btn btn-dark btn-sm js-task-open-only', "Finish");
-            createOperationAddingForm(section);
+            createOperationAddingForm(section, ulElement, taskId, taskStatus);
 
         }
 
@@ -130,6 +139,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 return json.data;
             })
             .then(function (data) {
+                data.sort(function(a, b) {
+                    return new Date(a.addedDate) - new Date(b.addedDate);
+                })
                 data.forEach(function (operation) {
                     renderOperation(operationListTag, sectionTag, operation, taskStatus);
                 })
@@ -140,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderOperation(operationListTag, sectionTag, data, taskStatus) {
         let timeSpent = formatTime(data.timeSpent);
         let description = data.description;
-        let operationId = data.id;
+        // let operationId = data.id;
         const li = createTagElement("li", operationListTag, "list-group-item d-flex justify-content-between align-items-center");
         const descriptionDiv = createTagElement("div", li, "", description);
         const time = createTagElement("time", descriptionDiv, "badge badge-success badge-pill ml-2", timeSpent);
@@ -166,8 +178,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-    function validateInput(taskName, taskDescription) {
-        return (taskName && taskName.length > 5 && taskDescription && taskDescription.length > 5)
+    function validateInput(...inputValues) {
+        inputValues.forEach(function (input) {
+            if (!input || input.length < 5) {
+                return false;
+            }
+        })
+        return true;
     }
 
     function sendPostReqToAddTask(taskName, taskDescription) {
@@ -250,6 +267,43 @@ document.addEventListener("DOMContentLoaded", function () {
                 deleteTaskFromView(taskSection);
             }
         })
+    }
+
+//     Add operation functionality
+
+    function apiAddOperation(taskId, operationDescription) {
+        const url = hostAddress + "/api/tasks/" + taskId + "/operations";
+        return fetch(url, {
+            method: "POST",
+            headers: {Authorization: apiKey, 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                description: operationDescription,
+                timeSpent: 0
+            })
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
+                } else {
+                    return response;
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
+    function addOperation(operationDescription, taskId, taskStatus, section, listTag) {
+        apiAddOperation(taskId, operationDescription)
+            .then(function (response) {
+                if (response.ok) {
+                    renderOperation(listTag, section, {
+                        description: operationDescription,
+                        timeSpent: 0
+                    }, taskStatus);
+                }
+            })
+
     }
 
 })
