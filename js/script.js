@@ -296,14 +296,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function addOperation(operationDescription, taskId, taskStatus, section, listTag) {
         apiAddOperation(taskId, operationDescription)
             .then(function (response) {
-                if (response.ok) {
-                    renderOperation(listTag, section, {
-                        description: operationDescription,
-                        timeSpent: 0
-                    }, taskStatus);
-                }
+                return response.json()
             })
-
+            .then(function (json) {
+                const data = json.data;
+                renderOperation(listTag, section, data, taskStatus);
+            });
     }
 
 })
