@@ -166,14 +166,18 @@ document.addEventListener("DOMContentLoaded", function () {
         if (taskStatus !== "closed") {
             const buttonDiv = createTagElement("div", li);
             const subtractMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm mr-2", "-15m");
+            if (timeSpentInMinutes < 15) {
+                subtractMinutesButton.setAttribute("disabled", true);
+            }
+
             const addMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+15m");
             const addHourButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+1h");
             const deleteButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm", "Delete");
-
+            
             subtractMinutesButton.addEventListener("click", function (event) {
                 event.preventDefault();
                 if (formatTimeToMinutes(time.innerText) >= 15) {
-                    updateOperationTime(time, operationId, description, -15);
+                    updateOperationTime(time, operationId, description, -15, subtractMinutesButton);
                 }
             });
 
@@ -343,7 +347,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    function updateOperationTime(timeTag, operationId, operationDescription, timeToAdd) {
+    function updateOperationTime(timeTag, operationId, operationDescription, timeToAdd, subtractMinutesButton) {
         let operationTimeInMinutes = formatTimeToMinutes(timeTag.innerText);
         console.log(operationTimeInMinutes);
         let updatedTime = operationTimeInMinutes + timeToAdd;
@@ -356,8 +360,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 return response.json();
             })
             .then(function (json) {
-                console.log(json.data);
-                timeTag.innerText = formatTime(json.data.timeSpent);
+                let retrievedTime = json.data.timeSpent;
+                if (retrievedTime < 15) {
+                    subtractMinutesButton.setAttribute("disabled", true);
+                }
+                timeTag.innerText = formatTime(retrievedTime);
+
             })
 
     }
