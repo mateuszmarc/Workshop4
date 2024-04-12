@@ -181,6 +181,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 event.preventDefault();
                 updateOperationTime(time, operationId, description, 60);
             })
+
+            deleteButton.addEventListener("click", function(event){
+                event.preventDefault();
+                deleteOperation(operationId, li);
+            })
         }
     }
 
@@ -369,4 +374,36 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log(error);
             })
     }
+
+//     Delete operation functionality
+    function apiDeleteOperation(operationId) {
+        const url = hostAddress + "/api/operations/" + operationId;
+
+        return fetch(url, {
+            method: "DELETE",
+            headers: {
+                Authorization: apiKey
+            }
+        })
+            .then(function(response) {
+                if (!response.ok) {
+                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
+                } else {
+                    return response;
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+    }
+
+    function deleteOperation(operationId, liElementTag) {
+        apiDeleteOperation(operationId)
+            .then(function(json) {
+                if (!json.error) {
+                    liElementTag.remove();
+                }
+            })
+    }
+
 })
