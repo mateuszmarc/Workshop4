@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const apiKey = "557eefe2-d52f-4386-a63f-3582e64b94a4";
-    const hostAddress = "https://todo-api.coderslab.pl";
+    const apiKey = "2db8fb05-df5b-48e2-a6f6-d7031b49629b";
+    const hostAddress = "https://todo-api.coderslab.pl/api";
+    const genericHeader = {Authorization: apiKey, 'Content-Type': 'application/json'};
     const mainElement = document.querySelector("main");
 
     // Add task form elements
@@ -8,42 +9,96 @@ document.addEventListener("DOMContentLoaded", function () {
     const taskNameInput = taskAddingForm.firstElementChild.firstElementChild;
     const taskDescriptionInput = taskAddingForm.firstElementChild.nextElementSibling.firstElementChild;
     clearFormInput(taskNameInput, taskDescriptionInput);
+    taskAddingForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        addTask();
+    });
 
-    // Display tasks with operations
+    // Main function to communicate with api
+    function sendRequestToApi(apiUrl, method, headers, body = null) {
+        return fetch(apiUrl, {method: method, headers: headers, body: body})
+            .then(function (response) {
+                if (!response.ok) {
+                    alert('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
+                } else {
+                    return response.json();
+                }
+            })
+    }
 
-    // Functions responsible for interaction with api
-    // fetch data - generic function that returns data in json format based on url passed
-    function fetchDataFromApi(apiUrl) {
-        return fetch(apiUrl, {
-            headers: {
-                method: 'get',
-                Authorization: apiKey,
-            }
-        }).then(function (response) {
-            if (!response.ok) {
-                console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
-            } else {
-                return response;
+
+    function apiGetAllTasks() {
+        const url = hostAddress + "/tasks";
+        return sendRequestToApi(url, "GET", genericHeader);
+    }
+
+    function apiAddTask(taskTitle, taskDescription) {
+        const url = hostAddress + "/tasks";
+        const body = JSON.stringify({title: taskTitle, description: taskDescription, status: "open"});
+        return sendRequestToApi(url, "POST", genericHeader, body);
+    }
+
+    function apiUpdateTask(taskId, taskTitle, taskDescription, taskStatus) {
+        const url = hostAddress + "/tasks/" + taskId;
+        const body = JSON.stringify({title: taskTitle, description: taskDescription, status: taskStatus});
+        return sendRequestToApi(url, "PUT", genericHeader, body);
+    }
+
+    function apiDeleteTask(taskId) {
+        const url = hostAddress + "/tasks/" + taskId;
+        return sendRequestToApi(url, "DELETE", genericHeader);
+    }
+
+    function apiListTaskOperations(taskId) {
+        const url = hostAddress + "/tasks/" + taskId + "/operations";
+        return sendRequestToApi(url, "GET", genericHeader);
+    }
+
+    function apiAddOperation(taskId, operationDescription) {
+        const url = hostAddress + "/tasks/" + taskId + "/operations";
+        const body = JSON.stringify({description: operationDescription, timeSpent: 0});
+        return sendRequestToApi(url, "POST", genericHeader, body);
+    }
+
+    function apiUpdateOperation(operationId, operationTime, operationDescription) {
+        const url = hostAddress + "/operations/" + operationId;
+        const body = JSON.stringify({description: operationDescription, timeSpent: operationTime});
+        return sendRequestToApi(url, "PUT", genericHeader, body);
+    }
+
+    function apiDeleteOperation(operationId) {
+        const url = hostAddress + "/operations/" + operationId;
+        return sendRequestToApi(url, "DELETE", genericHeader);
+    }
+
+
+    function addTask() {
+        let taskName = taskNameInput.value;
+        let taskDescription = taskDescriptionInput.value;
+        if (validateInput(taskName, taskDescription)) {
+            clearFormInput(taskNameInput, taskDescriptionInput);
+            apiAddTask(taskName, taskDescription)
+                .then(function (json) {
+                    renderTask(json.data);
+                });
+        }
+    }
+
+    function clearFormInput(...input) {
+        input.forEach(function (element) {
+            element.value = "";
+        })
+
+    }
+
+    function validateInput(...inputValues) {
+        inputValues.forEach(function (input) {
+            if (!input || input.length < 5) {
+                return false;
             }
         })
-            .then(function (response) {
-                return response.json();
-            });
+        return true;
     }
-
-    // get all tasks
-    function getTasks() {
-        const getTasksUrl = hostAddress + "/api/tasks"
-        return fetchDataFromApi(getTasksUrl);
-    }
-
-    // function to get Operations for specific task
-    function apiListOperationsForTask(taskId) {
-        const url = hostAddress + "/api/tasks/" + taskId + "/operations";
-        return fetchDataFromApi(url);
-    }
-    // End of functions responsible for interaction with api
-
 
     //  tag creation functions begin
 
@@ -82,9 +137,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return formContainerDiv;
     }
 
-    // main function combining creation of tasks with operations for given task
     function displayTasks() {
-        getTasks()
+        apiGetAllTasks()
             .then(function (response) {
                 response.data.forEach(function (task) {
                     renderTask(task);
@@ -137,10 +191,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return hours + "h " + minutes + "m";
     }
 
-
+    displayTasks();
+    //
     // main displayOperations() function which is used in renderTask() function
     function displayOperations(taskId, sectionTag, operationListTag, taskStatus) {
-        apiListOperationsForTask(taskId)
+        apiListTaskOperations(taskId)
             .then(function (json) {
                 return json.data;
             })
@@ -173,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const addMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+15m");
             const addHourButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+1h");
             const deleteButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm", "Delete");
-            
+
             subtractMinutesButton.addEventListener("click", function (event) {
                 event.preventDefault();
                 if (formatTimeToMinutes(time.innerText) >= 15) {
@@ -201,139 +256,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
-    displayTasks();
-
-//     Add task functionality
-//     addTask() helper methods
-
-    function clearFormInput(...input) {
-        input.forEach(function (element) {
-            element.value = "";
-        })
-
-    }
-
-    function validateInput(...inputValues) {
-        inputValues.forEach(function (input) {
-            if (!input || input.length < 5) {
-                return false;
-            }
-        })
-        return true;
-    }
-
-    function sendPostReqToAddTask(taskName, taskDescription) {
-        const url = hostAddress + "/api/tasks";
-        return fetch(url, {
-            method: "POST",
-            headers: {
-                Authorization: apiKey, 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: taskName,
-                description: taskDescription,
-                status: 'open',
-            })
-        })
-            .then(function (response) {
-                if (!response.ok) {
-                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
-                } else {
-                    return response;
-                }
-            })
-            .then(function (response) {
-                return response.json();
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-    }
-
-    function addTask() {
-        let taskName = taskNameInput.value;
-        let taskDescription = taskDescriptionInput.value;
-        if (validateInput(taskName, taskDescription)) {
-            clearFormInput(taskNameInput, taskDescriptionInput);
-            sendPostReqToAddTask(taskName, taskDescription)
-                .then(function (json) {
-                    renderTask(json.data);
-                });
-        }
-    }
-
-    taskAddingForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        addTask();
-    });
-
-//     Delete functionality
-    function apiDeleteTask(taskId){
-        const url = hostAddress + "/api/tasks/" + taskId;
-        return fetch(url, {
-            method: "DELETE",
-            headers : {
-                Authorization: apiKey,
-            }
-        })
-            .then(function(response) {
-                if (!response.ok) {
-                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
-                } else {
-                    return response;
-                }
-            })
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function (json) {
-                return json.data.raw.affectedRows;
-            })
-    }
-
-    function deleteTaskFromView(section) {
-        section.remove();
-    }
+//     displayTasks();
+//
+// //     Add task functionality
+// //     addTask() helper methods
 
     function deleteTask(taskId, taskSection) {
-        const result = apiDeleteTask(taskId);
-        result.then(function (rowsAffected) {
-            if (rowsAffected) {
-                deleteTaskFromView(taskSection);
+        apiDeleteTask(taskId).then(function (json) {
+            console.log(json);
+            if (json.data.affected) {
+                taskSection.remove();
             }
         })
-    }
-
-//     Add operation functionality
-
-    function apiAddOperation(taskId, operationDescription) {
-        const url = hostAddress + "/api/tasks/" + taskId + "/operations";
-        return fetch(url, {
-            method: "POST",
-            headers: {Authorization: apiKey, 'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                description: operationDescription,
-                timeSpent: 0
-            })
-        })
-            .then(function (response) {
-                if (!response.ok) {
-                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
-                } else {
-                    return response;
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
     }
 
     function addOperation(operationDescription, taskId, taskStatus, section, listTag) {
         apiAddOperation(taskId, operationDescription)
-            .then(function (response) {
-                return response.json()
-            })
             .then(function (json) {
                 const data = json.data;
                 renderOperation(listTag, section, data, taskStatus);
@@ -355,13 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(operationTimeInMinutes);
         let updatedTime = operationTimeInMinutes + timeToAdd;
         console.log(updatedTime);
-        const apiResponse = apiUpdateOperation(operationId, updatedTime, operationDescription);
-        apiResponse.then(function (response) {
-            return response;
-        })
-            .then(function (response) {
-                return response.json();
-            })
+        apiUpdateOperation(operationId, updatedTime, operationDescription)
             .then(function (json) {
                 let retrievedTime = json.data.timeSpent;
                 if (retrievedTime < 15) {
@@ -373,80 +305,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-    function apiUpdateOperation(operationId, updatedTime, operationDescription) {
-        const url = hostAddress + "/api/operations/" + operationId;
-        return fetch(url, {
-            method: "PUT", headers: {
-                Authorization: apiKey, 'Content-Type': 'application/json'
-            }, body: JSON.stringify({description: operationDescription, timeSpent: updatedTime})
-        })
-            .then(function (response) {
-                if (!response.ok) {
-                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
-                } else {
-                    return response;
-                }
-            }).catch(function (error) {
-                console.log(error);
-            })
-    }
-
-//     Delete operation functionality
-    function apiDeleteOperation(operationId) {
-        const url = hostAddress + "/api/operations/" + operationId;
-
-        return fetch(url, {
-            method: "DELETE",
-            headers: {
-                Authorization: apiKey
-            }
-        })
-            .then(function(response) {
-                if (!response.ok) {
-                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
-                } else {
-                    return response;
-                }
-            })
-            .then(function(response) {
-                return response.json();
-            })
-    }
-
     function deleteOperation(operationId, liElementTag) {
         apiDeleteOperation(operationId)
             .then(function(json) {
                 if (!json.error) {
                     liElementTag.remove();
                 }
-            })
-    }
-
-//     Finish task functionality
-    function apiUpdateTask(taskId, taskTitle, taskDescription, taskStatus) {
-        const url = hostAddress + "/api/tasks/" + taskId;
-
-        return fetch(url, {
-            method: "PUT",
-            headers: {
-                Authorization: apiKey,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: taskTitle,
-                description: taskDescription,
-                status: taskStatus
-            })
-        })
-            .then(function(response) {
-                if (!response.ok) {
-                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
-                } else {
-                    return response;
-                }
-            })
-            .then(function(response) {
-                return response.json();
             })
     }
 
