@@ -77,7 +77,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 addOperation(description, taskId, taskStatus, section, listTag);
                 inputTag.value = "";
             }
-        })
+        });
+
+        return formElement;
     }
 
     // main function combining creation of tasks with operations for given task
@@ -109,9 +111,12 @@ document.addEventListener("DOMContentLoaded", function () {
         displayOperations(taskId, section, ulElement, taskStatus);
 
         if (taskStatus === "open") {
+            const formDivWrapper = createOperationAddingForm(section, ulElement, taskId, taskStatus);
             const finishButton = createTagElement("button", headerRightDiv, 'btn btn-dark btn-sm js-task-open-only', "Finish");
-            createOperationAddingForm(section, ulElement, taskId, taskStatus);
-
+            finishButton.addEventListener("click", function(event) {
+                event.preventDefault();
+                updateTask(taskId, taskTitle, taskDescription, "closed", formDivWrapper, finishButton);
+            })
         }
 
         const deleteButton = createTagElement("button", headerRightDiv, 'btn btn-outline-danger btn-sm ml-2', "Delete");
@@ -404,6 +409,44 @@ document.addEventListener("DOMContentLoaded", function () {
                     liElementTag.remove();
                 }
             })
+    }
+
+//     Finish task functionality
+    function apiUpdateTask(taskId, taskTitle, taskDescription, taskStatus) {
+        const url = hostAddress + "/api/tasks/" + taskId;
+
+        return fetch(url, {
+            method: "PUT",
+            headers: {
+                Authorization: apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: taskTitle,
+                description: taskDescription,
+                status: taskStatus
+            })
+        })
+            .then(function(response) {
+                if (!response.ok) {
+                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
+                } else {
+                    return response;
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+    }
+
+    function updateTask(taskId, taskTitle, taskDescription, taskStatus, formDiv, finishButton) {
+        apiUpdateTask(taskId, taskTitle, taskDescription, taskStatus)
+            .then(function(json) {
+                if (json.data.status === "closed") {
+                    finishButton.remove();
+                    formDiv.remove()
+                }
+            });
     }
 
 })
