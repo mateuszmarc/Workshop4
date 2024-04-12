@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const li = createTagElement("li", operationListTag, "list-group-item d-flex justify-content-between align-items-center");
         const descriptionDiv = createTagElement("div", li, "", description);
         const time = createTagElement("time", descriptionDiv, "badge badge-success badge-pill ml-2", timeSpent);
-        if (taskStatus !== "closed") {
+        if (taskStatus === "open") {
             const buttonDiv = createTagElement("div", li);
             const subtractMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm mr-2", "-15m");
             if (timeSpentInMinutes < 15) {
@@ -184,11 +184,14 @@ document.addEventListener("DOMContentLoaded", function () {
             addMinutesButton.addEventListener("click", function (event) {
                 event.preventDefault();
                 updateOperationTime(time, operationId, description, 15);
+                subtractMinutesButton.removeAttribute("disabled");
+
             })
 
             addHourButton.addEventListener("click", function (event) {
                 event.preventDefault();
                 updateOperationTime(time, operationId, description, 60);
+                subtractMinutesButton.removeAttribute("disabled");
             })
 
             deleteButton.addEventListener("click", function(event){
