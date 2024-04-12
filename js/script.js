@@ -75,6 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let description = inputTag.value;
             if (validateInput(description)) {
                 addOperation(description, taskId, taskStatus, section, listTag);
+                inputTag.value = "";
             }
         })
     }
@@ -150,9 +151,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // function that is used in main displayOperations() function
     function renderOperation(operationListTag, sectionTag, data, taskStatus) {
-        let timeSpent = formatTime(data.timeSpent);
+        let timeSpentInMinutes = data.timeSpent;
+        let timeSpent = formatTime(timeSpentInMinutes);
         let description = data.description;
-        // let operationId = data.id;
+        let operationId = data.id;
         const li = createTagElement("li", operationListTag, "list-group-item d-flex justify-content-between align-items-center");
         const descriptionDiv = createTagElement("div", li, "", description);
         const time = createTagElement("time", descriptionDiv, "badge badge-success badge-pill ml-2", timeSpent);
@@ -162,6 +164,23 @@ document.addEventListener("DOMContentLoaded", function () {
             const addMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+15m");
             const addHourButton = createTagElement("button", buttonDiv, "btn btn-outline-success btn-sm mr-2", "+1h");
             const deleteButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm", "Delete");
+
+            subtractMinutesButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                if (formatTimeToMinutes(time.innerText) >= 15) {
+                    updateOperationTime(time, operationId, description, -15);
+                }
+            });
+
+            addMinutesButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                updateOperationTime(time, operationId, description, 15);
+            })
+
+            addHourButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                updateOperationTime(time, operationId, description, 60);
+            })
         }
     }
 
@@ -304,4 +323,50 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+//     Update operation time functionality
+    function formatTimeToMinutes(time) {
+        let timeParts = time.substring(0, time.length - 1).split("h");
+        if (timeParts.length > 1) {
+            return Number.parseInt(timeParts[0]) * 60 + Number.parseInt(timeParts[1]);
+        }
+        return Number.parseInt(time);
+    }
+
+
+    function updateOperationTime(timeTag, operationId, operationDescription, timeToAdd) {
+        let operationTimeInMinutes = formatTimeToMinutes(timeTag.innerText);
+        console.log(operationTimeInMinutes);
+        let updatedTime = operationTimeInMinutes + timeToAdd;
+        console.log(updatedTime);
+        const apiResponse = apiUpdateOperation(operationId, updatedTime, operationDescription);
+        apiResponse.then(function (response) {
+            return response;
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (json) {
+                console.log(json.data);
+                timeTag.innerText = formatTime(json.data.timeSpent);
+            })
+
+    }
+
+    function apiUpdateOperation(operationId, updatedTime, operationDescription) {
+        const url = hostAddress + "/api/operations/" + operationId;
+        return fetch(url, {
+            method: "PUT", headers: {
+                Authorization: apiKey, 'Content-Type': 'application/json'
+            }, body: JSON.stringify({description: operationDescription, timeSpent: updatedTime})
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    console.log('Wystąpił błąd! Otwórz devtools i zakładkę Sieć/Network, i poszukaj przyczyny');
+                } else {
+                    return response;
+                }
+            }).catch(function (error) {
+                console.log(error);
+            })
+    }
 })
