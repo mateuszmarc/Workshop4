@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        return formElement;
+        return formContainerDiv;
     }
 
     // main function combining creation of tasks with operations for given task
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const finishButton = createTagElement("button", headerRightDiv, 'btn btn-dark btn-sm js-task-open-only', "Finish");
             finishButton.addEventListener("click", function(event) {
                 event.preventDefault();
-                updateTask(taskId, taskTitle, taskDescription, "closed", formDivWrapper, finishButton);
+                updateTask(taskId, taskTitle, taskDescription, "closed", formDivWrapper, finishButton, section);
             })
         }
 
@@ -447,12 +447,16 @@ document.addEventListener("DOMContentLoaded", function () {
             })
     }
 
-    function updateTask(taskId, taskTitle, taskDescription, taskStatus, formDiv, finishButton) {
+    function updateTask(taskId, taskTitle, taskDescription, taskStatus, formDiv, finishButton, section) {
         apiUpdateTask(taskId, taskTitle, taskDescription, taskStatus)
             .then(function(json) {
                 if (json.data.status === "closed") {
                     finishButton.remove();
                     formDiv.remove()
+                    const operations = section.querySelectorAll("ul li");
+                    operations.forEach(function (operation) {
+                        operation.firstElementChild.nextElementSibling.remove();
+                    })
                 }
             });
     }
