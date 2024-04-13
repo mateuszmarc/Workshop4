@@ -144,7 +144,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const subtractMinutesButton = listItemTag.querySelector("div button");
         let operationTimeInMinutes = formatTimeToMinutes(timeTag.innerText);
         let updatedTime = operationTimeInMinutes + timeToAdd;
-        console.log(updatedTime);
         apiUpdateOperation(operationId, updatedTime, operationDescription)
             .then(function (json) {
                 let retrievedTime = json.data.timeSpent;
