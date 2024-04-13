@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
         apiUpdateTask(taskId, taskTitle, taskDescription, taskStatus).then(function (json) {
             if (json.data.status === "closed") {
                 taskSection.querySelector(".card-body").remove();
-                taskSection.querySelector(".card-header.d-flex.justify-content-between.align-items-center div").nextElementSibling.remove();
+                taskSection.querySelector(".card-header.d-flex.justify-content-between.align-items-center div").nextElementSibling.firstElementChild.remove();
                 const operations = taskSection.querySelectorAll("ul li");
                 operations.forEach(function (operation) {
                     operation.firstElementChild.nextElementSibling.remove();
