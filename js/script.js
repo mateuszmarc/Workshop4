@@ -1,14 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const apiKey = "2db8fb05-df5b-48e2-a6f6-d7031b49629b";
+    const apiKey = "";
     const hostAddress = "https://todo-api.coderslab.pl/api";
+    const apiKeyUrl = " https://todo-api.coderslab.pl/apikey/create"
     const genericHeader = {Authorization: apiKey, 'Content-Type': 'application/json'};
+
+    if (apiKey === "") {
+        alert(`You have to generate api key in order to use this app. Visit ${apiKeyUrl}. Assign given key to apiKey variable in script.js file.`)
+    }
+
     const mainElement = document.querySelector("main");
 
-    // Add task form elements
     const taskAddingForm = document.querySelector(".js-task-adding-form");
     const taskNameInput = taskAddingForm.firstElementChild.firstElementChild;
     const taskDescriptionInput = taskAddingForm.firstElementChild.nextElementSibling.firstElementChild;
     clearFormInput(taskNameInput, taskDescriptionInput);
+
     taskAddingForm.addEventListener("submit", function (event) {
         event.preventDefault();
         addTask();
@@ -23,9 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 } else {
                     return response.json();
                 }
-            })
+            });
     }
-
 
     function apiGetAllTasks() {
         const url = hostAddress + "/tasks";
@@ -72,35 +77,94 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    function displayTasks() {
+        apiGetAllTasks().then(function (response) {
+            response.data.forEach(function (task) {
+                renderTask(task);
+            });
+        });
+    }
+
     function addTask() {
         let taskName = taskNameInput.value;
         let taskDescription = taskDescriptionInput.value;
         if (validateInput(taskName, taskDescription)) {
             clearFormInput(taskNameInput, taskDescriptionInput);
-            apiAddTask(taskName, taskDescription)
-                .then(function (json) {
+            apiAddTask(taskName, taskDescription).then(function (json) {
                     renderTask(json.data);
                 });
         }
     }
 
-    function clearFormInput(...input) {
-        input.forEach(function (element) {
-            element.value = "";
-        })
-
+    function updateTask(taskId, taskTitle, taskDescription, taskStatus, taskSection) {
+        apiUpdateTask(taskId, taskTitle, taskDescription, taskStatus).then(function (json) {
+            if (json.data.status === "closed") {
+                taskSection.querySelector(".card-body").remove();
+                taskSection.querySelector(".card-header.d-flex.justify-content-between.align-items-center div").nextElementSibling.remove();
+                const operations = taskSection.querySelectorAll("ul li");
+                operations.forEach(function (operation) {
+                    operation.firstElementChild.nextElementSibling.remove();
+                });
+            }
+        });
     }
 
-    function validateInput(...inputValues) {
-        inputValues.forEach(function (input) {
-            if (!input || input.length < 5) {
-                return false;
+    function deleteTask(taskId, taskSection) {
+        apiDeleteTask(taskId).then(function (json) {
+            if (json.data.affected) {
+                taskSection.remove();
             }
         })
-        return true;
     }
 
-    //  tag creation functions begin
+
+    function displayOperations(taskId, sectionTag, taskStatus) {
+        apiListTaskOperations(taskId).then(function (json) {
+            return json.data;
+        }).then(function (data) {
+            data.sort(function (a, b) {
+                return new Date(a.addedDate) - new Date(b.addedDate);
+            });
+            data.forEach(function (operation) {
+                renderOperation(sectionTag, operation, taskStatus);
+            });
+        });
+    }
+
+    function addOperation(operationDescription, taskId, taskStatus, taskSection) {
+        apiAddOperation(taskId, operationDescription)
+            .then(function (json) {
+                const taskData = json.data;
+                renderOperation(taskSection, taskData, taskStatus);
+            });
+    }
+
+    function updateOperationTime(listItemTag, operationId, operationDescription, timeToAdd) {
+        const timeTag = listItemTag.querySelector("time");
+        const subtractMinutesButton = listItemTag.querySelector("div button");
+        let operationTimeInMinutes = formatTimeToMinutes(timeTag.innerText);
+        let updatedTime = operationTimeInMinutes + timeToAdd;
+        console.log(updatedTime);
+        apiUpdateOperation(operationId, updatedTime, operationDescription)
+            .then(function (json) {
+                let retrievedTime = json.data.timeSpent;
+                if (retrievedTime < 15) {
+                    subtractMinutesButton.setAttribute("disabled", true);
+                } else {
+                    subtractMinutesButton.removeAttribute("disabled");
+                }
+                timeTag.innerText = formatTime(retrievedTime);
+            });
+    }
+
+    function deleteOperation(operationId, liElementTag) {
+        apiDeleteOperation(operationId).then(function (json) {
+            if (!json.error) {
+                liElementTag.remove();
+            }
+        })
+    }
+
 
     // tag creation generic function
     function createTagElement(tagType, parentElement, className = "", innerText = "") {
@@ -111,113 +175,51 @@ document.addEventListener("DOMContentLoaded", function () {
         return element;
     }
 
-    // form creation function used in renderTask() function
-    function createOperationAddingForm(section, listTag, taskId, taskStatus) {
-        const formContainerDiv = createTagElement("div", section, "card-body");
-        const formElement = createTagElement("form", formContainerDiv);
-        const inputDiv = createTagElement("div", formElement, "input-group");
-        const inputTag = createTagElement("input", inputDiv, "form-control");
-        inputTag.type = "text";
-        inputTag.placeholder = "Operation description";
-        inputTag.minLength = "5";
-        inputTag.required = true;
-        const buttonDivWrapper = createTagElement("div", inputDiv, "input-group-append");
-        const addOperationButton = createTagElement("button", buttonDivWrapper, "btn btn-info", "Add");
-        // return formElement;
 
-        formElement.addEventListener("submit", function (event) {
-            event.preventDefault();
-            let description = inputTag.value;
-            if (validateInput(description)) {
-                addOperation(description, taskId, taskStatus, section, listTag);
-                inputTag.value = "";
-            }
-        });
-
-        return formContainerDiv;
-    }
-
-    function displayTasks() {
-        apiGetAllTasks()
-            .then(function (response) {
-                response.data.forEach(function (task) {
-                    renderTask(task);
-                })
-            })
-    }
-
-    // helper function for displayTasks() function
     function renderTask(task) {
         let taskId = task.id;
         let taskTitle = task.title;
         let taskDescription = task.description;
         let taskStatus = task.status;
 
-        const section = createTagElement("section", mainElement, "card mt-5 shadow-sm");
-        const headerDiv = createTagElement("div", section, 'card-header d-flex justify-content-between align-items-center')
+        const taskSection = createTagElement("section", mainElement, "card mt-5 shadow-sm");
+        const headerDiv = createTagElement("div", taskSection, 'card-header d-flex justify-content-between align-items-center')
         const headerLeftDiv = createTagElement("div", headerDiv);
         createTagElement("h5", headerLeftDiv, "", taskTitle);
         createTagElement("h6", headerLeftDiv, "card-subtitle text-muted", taskDescription);
         const headerRightDiv = createTagElement("div", headerDiv);
+        createTagElement("ul", taskSection, "list-group list-group-flush");
 
-        const ulElement = createTagElement("ul", section, "list-group list-group-flush");
-
-        displayOperations(taskId, section, ulElement, taskStatus);
+        displayOperations(taskId, taskSection, taskStatus);
 
         if (taskStatus === "open") {
-            const formDivWrapper = createOperationAddingForm(section, ulElement, taskId, taskStatus);
+            createAddOperationForm(taskSection, taskId, taskStatus);
             const finishButton = createTagElement("button", headerRightDiv, 'btn btn-dark btn-sm js-task-open-only', "Finish");
             finishButton.addEventListener("click", function(event) {
                 event.preventDefault();
-                updateTask(taskId, taskTitle, taskDescription, "closed", formDivWrapper, finishButton, section);
-            })
+                updateTask(taskId, taskTitle, taskDescription, "closed", taskSection);
+            });
         }
 
         const deleteButton = createTagElement("button", headerRightDiv, 'btn btn-outline-danger btn-sm ml-2', "Delete");
         deleteButton.addEventListener("click", function(event) {
             event.preventDefault();
-            deleteTask(taskId, section);
+            deleteTask(taskId, taskSection);
         });
     }
 
-    // renderOperations() helper functions begin
-    function formatTime(time) {
-        let hours = Math.floor(time / 60);
-        if (hours === 0) {
-            return time + "m";
-        }
 
-        let minutes = time - (hours * 60);
-        return hours + "h " + minutes + "m";
-    }
-
-    displayTasks();
-    //
-    // main displayOperations() function which is used in renderTask() function
-    function displayOperations(taskId, sectionTag, operationListTag, taskStatus) {
-        apiListTaskOperations(taskId)
-            .then(function (json) {
-                return json.data;
-            })
-            .then(function (data) {
-                data.sort(function(a, b) {
-                    return new Date(a.addedDate) - new Date(b.addedDate);
-                })
-                data.forEach(function (operation) {
-                    renderOperation(operationListTag, sectionTag, operation, taskStatus);
-                })
-            })
-    }
-
-    // function that is used in main displayOperations() function
-    function renderOperation(operationListTag, sectionTag, data, taskStatus) {
-        let timeSpentInMinutes = data.timeSpent;
+    function renderOperation(sectionTag, operationData, taskStatus) {
+        let timeSpentInMinutes = operationData.timeSpent;
         let timeSpent = formatTime(timeSpentInMinutes);
-        let description = data.description;
-        let operationId = data.id;
-        const li = createTagElement("li", operationListTag, "list-group-item d-flex justify-content-between align-items-center");
+        let description = operationData.description;
+        let operationId = operationData.id;
+        const operationList = sectionTag.querySelector(".list-group.list-group-flush");
+
+        const li = createTagElement("li", operationList, "list-group-item d-flex justify-content-between align-items-center");
         const descriptionDiv = createTagElement("div", li, "", description);
         const time = createTagElement("time", descriptionDiv, "badge badge-success badge-pill ml-2", timeSpent);
+
         if (taskStatus === "open") {
             const buttonDiv = createTagElement("div", li);
             const subtractMinutesButton = createTagElement("button", buttonDiv, "btn btn-outline-danger btn-sm mr-2", "-15m");
@@ -231,22 +233,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
             subtractMinutesButton.addEventListener("click", function (event) {
                 event.preventDefault();
-                if (formatTimeToMinutes(time.innerText) >= 15) {
-                    updateOperationTime(time, operationId, description, -15, subtractMinutesButton);
-                }
+                updateOperationTime(li, operationId, description, -15);
             });
 
             addMinutesButton.addEventListener("click", function (event) {
                 event.preventDefault();
-                updateOperationTime(time, operationId, description, 15);
-                subtractMinutesButton.removeAttribute("disabled");
+                updateOperationTime(li, operationId, description, 15);
 
             })
 
             addHourButton.addEventListener("click", function (event) {
                 event.preventDefault();
-                updateOperationTime(time, operationId, description, 60);
-                subtractMinutesButton.removeAttribute("disabled");
+                updateOperationTime(li, operationId, description, 60);
             })
 
             deleteButton.addEventListener("click", function(event){
@@ -256,29 +254,34 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-//     displayTasks();
-//
-// //     Add task functionality
-// //     addTask() helper methods
 
-    function deleteTask(taskId, taskSection) {
-        apiDeleteTask(taskId).then(function (json) {
-            console.log(json);
-            if (json.data.affected) {
-                taskSection.remove();
+    function createAddOperationForm(taskSection, taskId, taskStatus) {
+        const formContainerDiv = createTagElement("div", taskSection, "card-body");
+        const formElement = createTagElement("form", formContainerDiv);
+        const inputDiv = createTagElement("div", formElement, "input-group");
+        const inputTag = createTagElement("input", inputDiv, "form-control");
+
+        inputTag.type = "text";
+        inputTag.placeholder = "Operation description";
+        inputTag.minLength = "5";
+        inputTag.required = true;
+        const buttonDivWrapper = createTagElement("div", inputDiv, "input-group-append");
+        const addOperationButton = createTagElement("button", buttonDivWrapper, "btn btn-info", "Add");
+
+        formElement.addEventListener("submit", function (event) {
+            event.preventDefault();
+            let description = inputTag.value;
+            if (validateInput(description)) {
+                addOperation(description, taskId, taskStatus, taskSection);
+                inputTag.value = "";
             }
-        })
+        });
+
+        return formContainerDiv;
     }
 
-    function addOperation(operationDescription, taskId, taskStatus, section, listTag) {
-        apiAddOperation(taskId, operationDescription)
-            .then(function (json) {
-                const data = json.data;
-                renderOperation(listTag, section, data, taskStatus);
-            });
-    }
 
-//     Update operation time functionality
+    // Format time helper methods
     function formatTimeToMinutes(time) {
         let timeParts = time.substring(0, time.length - 1).split("h");
         if (timeParts.length > 1) {
@@ -287,45 +290,32 @@ document.addEventListener("DOMContentLoaded", function () {
         return Number.parseInt(time);
     }
 
+    function formatTime(time) {
+        let hours = Math.floor(time / 60);
+        if (hours === 0) {
+            return time + "m";
+        }
 
-    function updateOperationTime(timeTag, operationId, operationDescription, timeToAdd, subtractMinutesButton) {
-        let operationTimeInMinutes = formatTimeToMinutes(timeTag.innerText);
-        console.log(operationTimeInMinutes);
-        let updatedTime = operationTimeInMinutes + timeToAdd;
-        console.log(updatedTime);
-        apiUpdateOperation(operationId, updatedTime, operationDescription)
-            .then(function (json) {
-                let retrievedTime = json.data.timeSpent;
-                if (retrievedTime < 15) {
-                    subtractMinutesButton.setAttribute("disabled", true);
-                }
-                timeTag.innerText = formatTime(retrievedTime);
-
-            })
-
+        let minutes = time % 60;
+        return hours + "h " + minutes + "m";
     }
 
-    function deleteOperation(operationId, liElementTag) {
-        apiDeleteOperation(operationId)
-            .then(function(json) {
-                if (!json.error) {
-                    liElementTag.remove();
-                }
-            })
+    // Form helper methods
+    function clearFormInput(...input) {
+        input.forEach(function (element) {
+            element.value = "";
+        })
     }
 
-    function updateTask(taskId, taskTitle, taskDescription, taskStatus, formDiv, finishButton, section) {
-        apiUpdateTask(taskId, taskTitle, taskDescription, taskStatus)
-            .then(function(json) {
-                if (json.data.status === "closed") {
-                    finishButton.remove();
-                    formDiv.remove()
-                    const operations = section.querySelectorAll("ul li");
-                    operations.forEach(function (operation) {
-                        operation.firstElementChild.nextElementSibling.remove();
-                    })
-                }
-            });
+    function validateInput(...inputValues) {
+        inputValues.forEach(function (input) {
+            if (!input || input.length < 5) {
+                return false;
+            }
+        });
+        return true;
     }
 
-})
+
+    displayTasks();
+});
