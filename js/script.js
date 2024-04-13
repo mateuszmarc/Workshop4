@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
     const apiKey = "";
     const hostAddress = "https://todo-api.coderslab.pl/api";
-    const apiKeyUrl = " https://todo-api.coderslab.pl/apikey/create"
+    const apiKeyUrl = " https://todo-api.coderslab.pl/apikey/create";
     const genericHeader = {Authorization: apiKey, 'Content-Type': 'application/json'};
 
     if (apiKey === "") {
-        alert(`You have to generate api key in order to use this app. Visit ${apiKeyUrl}. Assign given key to apiKey variable in script.js file.`)
+        alert(`You have to generate api key in order to use this app. Visit ${apiKeyUrl}. Assign given key to apiKey variable in script.js file.`);
     }
 
     const mainElement = document.querySelector("main");
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (json.data.affected) {
                 taskSection.remove();
             }
-        })
+        });
     }
 
 
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!json.error) {
                 liElementTag.remove();
             }
-        })
+        });
     }
 
 
@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let taskStatus = task.status;
 
         const taskSection = createTagElement("section", mainElement, "card mt-5 shadow-sm");
-        const headerDiv = createTagElement("div", taskSection, 'card-header d-flex justify-content-between align-items-center')
+        const headerDiv = createTagElement("div", taskSection, 'card-header d-flex justify-content-between align-items-center');
         const headerLeftDiv = createTagElement("div", headerDiv);
         createTagElement("h5", headerLeftDiv, "", taskTitle);
         createTagElement("h6", headerLeftDiv, "card-subtitle text-muted", taskDescription);
@@ -239,17 +239,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 event.preventDefault();
                 updateOperationTime(li, operationId, description, 15);
 
-            })
+            });
 
             addHourButton.addEventListener("click", function (event) {
                 event.preventDefault();
                 updateOperationTime(li, operationId, description, 60);
-            })
+            });
 
             deleteButton.addEventListener("click", function(event){
                 event.preventDefault();
                 deleteOperation(operationId, li);
-            })
+            });
         }
     }
 
@@ -303,7 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function clearFormInput(...input) {
         input.forEach(function (element) {
             element.value = "";
-        })
+        });
     }
 
     function validateInput(...inputValues) {
