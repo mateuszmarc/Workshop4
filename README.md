@@ -6,18 +6,14 @@
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
-
-<!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
+
 
 <h3 align="center">Task management App</h3>
 
   <p align="center">
-    Simple application to manage tasks by communicating with server via api.
+    Simple applicaton to manage tasks by communicating with server
     <br />
     <a href="https://github.com/mateuszmarc/Workshop5"><strong>Explore the docs »</strong></a>
     <br />
