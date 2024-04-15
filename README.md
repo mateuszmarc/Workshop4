@@ -8,21 +8,19 @@
 
 <br />
 <div align="center">
-
-
-<h3 align="center">Task management App</h3>
+<h3 align="center">Task manager</h3>
 
   <p align="center">
-    Simple applicaton to manage tasks by communicating with server
+    Simple application to manage task using api to communicate with server that stores task data.
     <br />
     <a href="https://github.com/mateuszmarc/Workshop5"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
+    <a href="https://github.com/mateuszmarc/Workshop5">View Demo</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/mateuszmarc/Workshop5/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/mateuszmarc/Workshop5/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -50,7 +48,7 @@
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#acknowledgments">Thoughts and future extensions</a></li>
   </ol>
 </details>
 
@@ -59,82 +57,84 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Product Name Screen Shot][product-screenshot]](images/task-example.png)
 
-There are many great README templates available on GitHub; however, I didn't find one that really suited my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need -- I think this is it.
-
-Here's why:
-* Your time should be focused on creating something amazing. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like creating a README from scratch
-* You should implement DRY principles to the rest of your life :smile:
-
-Of course, no one template will serve all projects since your needs may be different. So I'll be adding more in the near future. You may also suggest changes by forking this repo and creating a pull request or opening an issue. Thanks to all the people have contributed to expanding this template!
-
-Use the `BLANK_README.md` to get started.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
+As I said before it is just simple task management app created to practise basics of javascript DOM manipulation and server communication using api.
+This application allows the user to add task along with specific operations required to finish entire task. 
+Api stores tasks and operations under address: [https://todo-api.coderslab.pl](https://todo-api.coderslab.pl).
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
-
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
+* [![html5][html.com]][html5-url]
+* [![javascript][javascript.com]][javascript-url]
 * [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+### Implementation
+This api specifies the way we can communicate with server:
 
+[![API description][api-description]](images/api-description.png)
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+You don't need much to use this app but below might help
+* simple code editor, for example: [brackets](https://brackets.io/) or just notepad to open script.js file.
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
-1. Get a free API Key at [https://example.com](https://example.com)
+1. Get a free API Key at [https://todo-api.coderslab.pl/apikey/create ](https://todo-api.coderslab.pl/apikey/create )
 2. Clone the repo
    ```sh
-   git clone https://github.com/your_username_/Project-Name.git
+   git clone https://github.com/mateuszmarc/Workshop5.git
    ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
+3. Enter your API in `js/script.js` file.
    ```js
-   const API_KEY = 'ENTER YOUR API';
+   const apiKey = 'ENTER YOUR API';
    ```
-
+   
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- USAGE EXAMPLES -->
 ## Usage
+In order to start using app you need to open [index.html](html/index.html) file in any browser. 
+#### Displaying all tasks 
+Once you open ```index.html``` in browser, ```GET``` request will be sent to server to list all tasks:
+[![Product Name Screen Shot][product-screenshot]](images/task-example.png)
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+### Adding the task
+Simply enter title of the task and its description. 
+After task added it will be displayed below, ready to add operations to. 
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+### Closing the task 
+Choose the task to close and click 'Finish' button. Task will be displayed as done, so the options to add, delete and update operations won't be available anymore.
+Also task status will be updated to 'closed' on server side. 
+
+### Deleting the task
+Click 'Delete' button associated with task to delete. 
+Task will be deleted from the view and from the server.
+
+### Adding operations to the task
+Choose the task to add operation to, enter operation description and click 'add' button. 
+New operation will be added to the view and saved on server side. 
+Once you create operation you can set the operation time, or delete operation.
+
+### Updating the operations for the task 
+If the task itself is not finished you can set the time of particular operation by clicking on 
+buttons. Operation time will be updated on view and on server side.
+
+### Deleting operations from the task 
+Click 'delete' button associated with task to delete. 
+It will be deleted from server and from the view.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -143,15 +143,16 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Add Changelog
-- [x] Add back to top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
+- [x] Displaying all tasks
+- [x] Adding all tasks
+  - [x] Adding operations to the task
+  - [x] Updating task operation times 
+  - [x] Delete task operations
+- [x] Delete task 
+- [x] Finish task
 
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
+
+See the [open issues](https://github.com/mateuszmarc/Workshop5/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -178,7 +179,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -187,27 +188,22 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_username) - email@example.com
+Mateusz Marcykiewicz - mmarcykiewicz@gmail.com
 
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+Project Link: [https://github.com/mateuszmarc/Workshop5](https://github.com/mateuszmarc/Workshop5)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
-
-* [Choose an Open Source License](https://choosealicense.com)
-* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-* [Malven's Flexbox Cheatsheet](https://flexbox.malven.co/)
-* [Malven's Grid Cheatsheet](https://grid.malven.co/)
-* [Img Shields](https://shields.io)
-* [GitHub Pages](https://pages.github.com)
-* [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
+## Thoughts and future extensions
+This project helped me to practice DOM manipulation using javascript and communication with api.
+In the future, project can be extended by following features:
+* Reopening the task
+* Specifying accurate time for the operation
+* Edit task title and description. 
+* Edit operation description
+* Add delete task confirmation window.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -218,29 +214,20 @@ Use this space to list resources you find helpful and would like to give credit 
 [contributors-shield]: https://img.shields.io/github/contributors/mateuszmarc/Workshop5.svg?style=for-the-badge
 [contributors-url]: https://github.com/mateuszmarc/Workshop5/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/mateuszmarc/Workshop5.svg?style=for-the-badge
-[forks-url]: https://github.com/mateuszmarc/Workshop5/forks
+[forks-url]: https://github.com/mateuszmarc/Workshop5/network/members
 [stars-shield]: https://img.shields.io/github/stars/mateuszmarc/Workshop5.svg?style=for-the-badge
 [stars-url]: https://github.com/mateuszmarc/Workshop5/stargazers
 [issues-shield]: https://img.shields.io/github/issues/mateuszmarc/Workshop5.svg?style=for-the-badge
 [issues-url]: https://github.com/mateuszmarc/Workshop5/issues
 [license-shield]: https://img.shields.io/github/license/mateuszmarc/Workshop5.svg?style=for-the-badge
-[license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
+[license-url]: https://github.com/mateuszmarc/Workshop5/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/mateusz-marcykiewicz/
-[product-screenshot]: images/screenshot.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
+[product-screenshot]: images/task-example.png
+[api-description]: images/api-description.png
 [Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[javascript.com]: https://img.shields.io/badge/javascript-icon?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E&color=black
+[javascript-url]: https://javascript.com 
+[html.com]: https://img.shields.io/badge/html-icon?style=for-the-badge&logo=html5&logoColor=%23E34F26&color=black
+[html5-url]: https://html.com/
