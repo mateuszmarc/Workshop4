@@ -4,7 +4,7 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-
+<a name="readme-top"></a>
 
 <br />
 <div align="center">
@@ -57,7 +57,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](images/task-example.png)
+[![Product Name Screen Shot][example]](images/example.png)
 
 As I said before it is just simple task management app created to practise basics of javascript DOM manipulation and server communication using api.
 This application allows the user to add task along with specific operations required to finish entire task. 
@@ -86,7 +86,7 @@ This api specifies the way we can communicate with server:
 ### Prerequisites
 
 You don't need much to use this app but below might help
-* simple code editor, for example: [brackets](https://brackets.io/) or just notepad to open script.js file.
+* simple code editor, for example: [brackets](https://brackets.io/) to open script.js file and assign value to ```apiKey``` variable.
 
 ### Installation
 
@@ -108,15 +108,23 @@ You don't need much to use this app but below might help
 ## Usage
 In order to start using app you need to open [index.html](html/index.html) file in any browser. 
 #### Displaying all tasks 
-Once you open ```index.html``` in browser, ```GET``` request will be sent to server to list all tasks:
-[![Product Name Screen Shot][product-screenshot]](images/task-example.png)
+Once you open ```index.html``` in browser, all tasks will be displayed. If you open the app for the first time 
+you will have listed two task examples.  
+[![Tasks example][task-example]](images/example.png)
+
 
 ### Adding the task
-Simply enter title of the task and its description. 
-After task added it will be displayed below, ready to add operations to. 
+Simply enter title of the task and its description.
+[![Tasks form][task-form]](images/task-form.png)
+
+
+After task added it will be displayed below, ready to add operations to.
+[![Add task][add-task]](images/add-task.png)
+
 
 ### Closing the task 
 Choose the task to close and click 'Finish' button. Task will be displayed as done, so the options to add, delete and update operations won't be available anymore.
+[![Close task][close-task]](images/close-task.png)
 Also task status will be updated to 'closed' on server side. 
 
 ### Deleting the task
@@ -124,13 +132,15 @@ Click 'Delete' button associated with task to delete.
 Task will be deleted from the view and from the server.
 
 ### Adding operations to the task
-Choose the task to add operation to, enter operation description and click 'add' button. 
+Choose the task to add operation to, enter operation description and click 'add' button.
+[![Add operation][add-operation]](images/add-operation.png)
 New operation will be added to the view and saved on server side. 
 Once you create operation you can set the operation time, or delete operation.
 
 ### Updating the operations for the task 
-If the task itself is not finished you can set the time of particular operation by clicking on 
-buttons. Operation time will be updated on view and on server side.
+If the task itself is not finished you can set the time of particular operation by clicking on buttons.
+[![Update operation][update-operation]](images/update-operation.png)
+Operation time will be updated on view and on server side.
 
 ### Deleting operations from the task 
 Click 'delete' button associated with task to delete. 
@@ -205,6 +215,8 @@ In the future, project can be extended by following features:
 * Edit operation description
 * Add delete task confirmation window.
 
+And adding tests for application is what I will do next for this project.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -225,6 +237,13 @@ In the future, project can be extended by following features:
 [linkedin-url]: https://www.linkedin.com/in/mateusz-marcykiewicz/
 [product-screenshot]: images/task-example.png
 [api-description]: images/api-description.png
+[example]: images/example.png
+[task-form]: images/task-form.png
+[add-task]: images/add-task.png
+[close-task]: images/close-task.png
+[add-operation]: images/add-operation.png
+[update-operation]: images/update-operation.png
+
 [Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [Bootstrap-url]: https://getbootstrap.com
 [javascript.com]: https://img.shields.io/badge/javascript-icon?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E&color=black
