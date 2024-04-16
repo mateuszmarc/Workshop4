@@ -238,6 +238,7 @@ And adding tests for application is what I will do next for this project.
 [product-screenshot]: images/task-example.png
 [api-description]: images/api-description.png
 [example]: images/example.png
+[task-example]: images/example.png
 [task-form]: images/task-form.png
 [add-task]: images/add-task.png
 [close-task]: images/close-task.png
