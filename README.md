@@ -34,6 +34,7 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#implementation">Implementation</a></li>
       </ul>
     </li>
     <li>
@@ -43,12 +44,23 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li>
+<a href="#usage">Usage</a>
+      <ul>
+        <li><a href="#displaying-all-tasks">Displaying all tasks</a></li>
+        <li><a href="#adding-the-task">Adding the task</a></li>
+        <li><a href="#closing-the-task">Closing the task</a></li>
+        <li><a href="#deleting-the-task">Deleting the task</a></li>
+        <li><a href="#adding-operations-to-the-task">Adding operations to the task</a></li>
+        <li><a href="#updating-operations-for-the-task">Updating operations for the task</a></li>
+        <li><a href="#deleting-operations-from-the-task">Deleting operations from the task</a></li>
+      </ul>
+</li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Thoughts and future extensions</a></li>
+    <li><a href="#thoughts-and-future-extensions">Thoughts and future extensions</a></li>
   </ol>
 </details>
 
@@ -107,7 +119,7 @@ You don't need much to use this app but below might help
 <!-- USAGE EXAMPLES -->
 ## Usage
 In order to start using app you need to open [index.html](html/index.html) file in any browser. 
-#### Displaying all tasks 
+#### Displaying all tasks
 Once you open ```index.html``` in browser, all tasks will be displayed. If you open the app for the first time 
 you will have listed two task examples.  
 [![Tasks example][task-example]](images/example.png)
@@ -122,7 +134,7 @@ After task added it will be displayed below, ready to add operations to.
 [![Add task][add-task]](images/add-task.png)
 
 
-### Closing the task 
+### Closing the task
 Choose the task to close and click 'Finish' button. Task will be displayed as done, so the options to add, delete and update operations won't be available anymore.
 [![Close task][close-task]](images/close-task.png)
 Also task status will be updated to 'closed' on server side. 
@@ -137,12 +149,12 @@ Choose the task to add operation to, enter operation description and click 'add'
 New operation will be added to the view and saved on server side. 
 Once you create operation you can set the operation time, or delete operation.
 
-### Updating the operations for the task 
+### Updating operations for the task
 If the task itself is not finished you can set the time of particular operation by clicking on buttons.
 [![Update operation][update-operation]](images/update-operation.png)
 Operation time will be updated on view and on server side.
 
-### Deleting operations from the task 
+### Deleting operations from the task
 Click 'delete' button associated with task to delete. 
 It will be deleted from server and from the view.
 
