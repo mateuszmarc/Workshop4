@@ -235,16 +235,16 @@ And adding tests for application is what I will do next for this project.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/mateuszmarc/Workshop5.svg?style=for-the-badge
-[contributors-url]: https://github.com/mateuszmarc/Workshop5/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/mateuszmarc/Workshop5.svg?style=for-the-badge
-[forks-url]: https://github.com/mateuszmarc/Workshop5/network/members
-[stars-shield]: https://img.shields.io/github/stars/mateuszmarc/Workshop5.svg?style=for-the-badge
-[stars-url]: https://github.com/mateuszmarc/Workshop5/stargazers
-[issues-shield]: https://img.shields.io/github/issues/mateuszmarc/Workshop5.svg?style=for-the-badge
-[issues-url]: https://github.com/mateuszmarc/Workshop5/issues
-[license-shield]: https://img.shields.io/github/license/mateuszmarc/Workshop5.svg?style=for-the-badge
-[license-url]: https://github.com/mateuszmarc/Workshop5/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/mateuszmarc/Workshop4.svg?style=for-the-badge
+[contributors-url]: https://github.com/mateuszmarc/Workshop4/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/mateuszmarc/Workshop4.svg?style=for-the-badge
+[forks-url]: https://github.com/mateuszmarc/Workshop4/network/members
+[stars-shield]: https://img.shields.io/github/stars/mateuszmarc/Workshop4.svg?style=for-the-badge
+[stars-url]: https://github.com/mateuszmarc/Workshop4/stargazers
+[issues-shield]: https://img.shields.io/github/issues/mateuszmarc/Workshop4.svg?style=for-the-badge
+[issues-url]: https://github.com/mateuszmarc/Workshop4/issues
+[license-shield]: https://img.shields.io/github/license/mateuszmarc/Workshop4.svg?style=for-the-badge
+[license-url]: https://github.com/mateuszmarc/Workshop4/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/mateusz-marcykiewicz/
 [product-screenshot]: images/task-example.png
